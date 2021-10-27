@@ -1,0 +1,165 @@
+#include <iostream>
+#include <iterator>
+#include <sstream>
+#include <vector>
+
+using namespace std;
+
+struct path
+{
+  int stringValue;
+  int numOfNeighbors = 0;
+  vector <string> neighbors;
+};
+
+int main()
+{                                                                           // main
+   string field;
+   string line;
+
+   bool duplicate = false;
+   bool prevNeighborFound = false;
+   bool nextNeighborFound = false;
+   bool swap = false;
+
+   int m = 0;
+   int index = 0;
+   int swapIndex = 0;
+
+   vector <string> pathHolder;
+   vector <path> allPaths;
+
+   path path_var;
+   path tempPath;
+
+   while(getline(cin, line))
+   {                                                                        // main while loop
+     // reads in first line of file, separates paths by space, and adds it into pathHolder vector
+     istringstream ss(line);
+     while (getline(ss, field, ' '))
+     {                                                                      // getline while loop
+       pathHolder.push_back(field);
+     }                                                                      // getline while loop end
+     // special case for if it is the very first path we are reading in 
+     if (allPaths.size() == 0)
+     {                                                                      // if allPaths is empty
+       path_var.stringValue = stoi(pathHolder[m]);
+       path_var.neighbors.push_back(pathHolder[m + 1]);
+       path_var.numOfNeighbors++;
+       allPaths.push_back(path_var);
+       m++;   
+     }                                                                      // if allPaths is empty end
+     path_var.numOfNeighbors = 0;
+     path_var.neighbors.clear();
+     // case for all the other times we read in a path number
+     for (int h = m; h < pathHolder.size(); h++)
+     {                                                                      // for rest of pathHolder loop
+       for (int a = 0; a < allPaths.size(); a++)
+       {                                                                    // for allPaths size loop
+         // stoi used to convert string to integer to make it easier to compare when sorting
+         if (stoi(pathHolder[h]) == allPaths[a].stringValue)           
+         {                                                                  // if string already in allPaths
+           duplicate = true;
+           index = a;
+         }                                                                  // if string already in allPaths end
+       }                                                                    // for allPaths size loop end
+         if (duplicate == false)
+         {                                                                  // if no duplicate
+           path_var.stringValue = stoi(pathHolder[h]);
+           if ((h - 1) >= 0)
+           {                                                                // if not first element in pathHolder
+             path_var.neighbors.push_back(pathHolder[h-1]);
+             path_var.numOfNeighbors++;
+           }                                                                // if not first element in pathHolder end
+           if ((h + 1) <= (pathHolder.size() - 1))
+           {                                                                // if not last element in pathHodler
+             path_var.neighbors.push_back(pathHolder[h+1]);
+             path_var.numOfNeighbors++;
+           }                                                                // if not last element in pathHolder end
+           allPaths.push_back(path_var);
+        }                                                                   // if no duplicate end
+
+       else if (duplicate == true)                                                                 
+       {                                                                    // else if duplicate
+         for (int i = 0; i < allPaths[index].neighbors.size(); i++)
+         {                                                                  // for neighbors size
+           if ((h - 1) >= 0)
+           {                                                                // if not first element
+             if (allPaths[index].neighbors[i] == pathHolder[h-1])
+             {                                                              // if prev neighbor found
+               prevNeighborFound = true;
+             }                                                              // if prev neighbor found end
+           }                                                                // if not first element end
+           if ((h + 1) < pathHolder.size())
+           {                                                                // if not last element
+             if (allPaths[index].neighbors[i] == pathHolder[h+1])
+             {                                                              // if next neighbor found 
+               nextNeighborFound = true;
+             }                                                              // if next neighbor found end
+           }
+         }                                                                  // if not last element end
+         if ((h - 1) >= 0)
+         {                                                                  // if not first element 
+           if (prevNeighborFound == false)
+           {                                                                // if adding prev neighbor
+             allPaths[index].neighbors.push_back(pathHolder[h-1]);
+             allPaths[index].numOfNeighbors++;
+           }                                                                // if adding prev neighbor end
+         }                                                                  // if not first element end
+         if ((h + 1) < pathHolder.size())
+         {                                                                  // if not last element
+           if (nextNeighborFound == false)
+           {                                                                // if adding next neighbor
+             allPaths[index].neighbors.push_back(pathHolder[h+1]);
+             allPaths[index].numOfNeighbors++;
+           }                                                                // if adding next neighbor end
+         }                                                                  // if not last element end
+       }                                                                    // else if duplicate end   
+
+       path_var.numOfNeighbors = 0;
+       path_var.neighbors.clear();
+       duplicate = false;
+       prevNeighborFound = false;
+       nextNeighborFound = false;
+     }                                                                      // for rest of pathHolder loop end
+     m = 0;
+     pathHolder.clear();
+   }                                                                        // main while loop end
+
+   for (int b = 0; b < allPaths.size(); b++)
+   {                                                                        // for allPaths size loop
+     for (int f = b + 1; f < allPaths.size(); f++)
+     {                                                                      // for last for loop + 1 to allPaths loop
+       if (allPaths[b].numOfNeighbors < allPaths[f].numOfNeighbors)
+       {                                                                    // if next element neighbor value greater, then swap
+         tempPath = allPaths[b];
+         allPaths[b] = allPaths[f];
+         allPaths[f] = tempPath;
+       }                                                                    // if next element neighbor value greater, then swap end
+       else if (allPaths[f].numOfNeighbors == allPaths[f + 1].numOfNeighbors)
+       {                                                                    // else if next element neighbor value is the same as current
+         if ((allPaths[f].stringValue) > (allPaths[f+1].stringValue))
+         {                                                                  // if string value of current is greater
+           swap = true;
+           swapIndex = f + 1;
+         }                                                                  // if string value of current is greater end 
+       }                                                                    // else if next element neighbor value is the same as current end 
+     }                                                                      // for last for loop + 1 to allPaths loop end
+     if (swap == true)
+     {                                                                      // if swap needed
+       for (int q = swapIndex; q < allPaths.size(); q++)
+       {                                                                    // for swapIndex to allPaths size loop
+             tempPath = allPaths[q - 1];
+             allPaths[q - 1] = allPaths[q];
+             allPaths[q] = tempPath;
+       }                                                                    // for swapIndex to allPaths size loop end 
+     }                                                                      // if swap needed end
+     swap == false;
+   }                                                                        // for allPaths size loop end
+   for(int j = 0; j < 10; j++)
+   {                                                                        // for 1st 10 indexes of allPaths
+     cout << "\n" << allPaths[j].stringValue << ": " << allPaths[j].numOfNeighbors; 
+   }                                                                        // for 1st 10 indexes of allPaths end
+   cout << endl;
+   return 0;
+}                                                                           // end main
