@@ -1,0 +1,56 @@
+#include <fstream>
+#include <string>
+#include <cstring>
+#include <sstream>
+#include <vector>
+
+using namespace std;
+
+int main()
+{
+  string str;
+  string ign;
+  int pipeCounter = 0;
+  int i = 0;
+  vector <int> v;
+
+  while (getline(cin, str, '|'))
+  {                                                                        // while reading in line loop until '|'
+      // keeps on reading until 7th field 
+      v.clear();
+      while (pipeCounter != 6)
+      {                                                                    // while pipe counter is not 6 loop
+        getline(cin, str, '|');
+        pipeCounter++;
+      }                                                                    // while pipe counter is not 6 loop end
+      // reads in 7th field
+      istringstream is(str);
+      int n;
+      while (is >> n)
+      {                                                                    // while reading in loop
+        // special case for the first time you are adding to vector
+        if (i == 0)
+        {                                                                  // if first value
+          v.push_back(n);
+          i++;
+        }                                                                  // if first value end
+        else if (i > 0)
+         {
+           if (n != v[i - 1])
+           {                                                               // if not repeated element
+             v.push_back(n);
+             i++;
+           }                                                               // if not repeated element end
+         }
+      }                                                                    // while reading in loop end
+      for (int j = 0; j < v.size(); j++)
+      {                                                                    // for v size loop 
+         cout << v[j] << " ";
+      }                                                                    // for v size loop end   
+      cout << "\n";
+      getline(cin, ign);                                                   // ignore rest of routing info
+      pipeCounter = 0;
+    }                                                                      // while reading in line loop until '|' end
+   cout << endl;
+   return 0;
+}
